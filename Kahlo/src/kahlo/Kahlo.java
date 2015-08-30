@@ -1,21 +1,21 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package kahlo;
 
+import componentes.KDialog;
+import config.ManejadorConfiguarciones;
+import inicioLib.PantallaCargandoMain;
 /**
- *
  * @author JCORREA
  */
 public class Kahlo {
 
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String[] args) {
-        System.out.println("Kahlo");
+    @SuppressWarnings("empty-statement")
+    public static void main(String[] args){
+        try{
+        ManejadorConfiguarciones.recuperaConfiguraciones();
+        }catch(Exception e){
+            new KDialog(null, "Error al recuperar la configuracion de la aplicacion", KDialog.Tipo.ALERTA);
+        }
+        new PantallaCargandoMain();
+        PanelMonitoreo.lanzadorPanelMonitoreo();
     }
-    
 }
