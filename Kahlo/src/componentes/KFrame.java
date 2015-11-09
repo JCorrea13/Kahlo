@@ -1,9 +1,8 @@
 package componentes;
 
+import Maps.KFrameMap;
 import com.teamdev.jxbrowser.chromium.Browser;
-import com.teamdev.jxbrowser.chromium.swing.BrowserView;
 import config.Config;
-import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.HeadlessException;
 import java.awt.Graphics;
@@ -16,9 +15,9 @@ import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
-import javax.swing.WindowConstants;
 import kahlo.AbrirMision;
 import kahlo.ConfiguracionMision;
+import kahlo.ConsolaKahlo;
 import kahlo.PanelMonitoreo;
 
 /**
@@ -106,13 +105,24 @@ public class KFrame extends javax.swing.JFrame{
             public void actionPerformed(ActionEvent e) {
                 getMapa();
                 mapa.setVisible(true);
+                new KFrameMap().actualizarMapa();
+            }
+        });
+        
+        JMenuItem mIConsolaKahlo = new JMenuItem("Consola Kahlo", KeyEvent.VK_K);
+        mIConsolaKahlo.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                ConsolaKahlo.getConsolaKahlo().setVisible(true);
             }
         });
                 
         m.add(mINuevaMision);
         m.add(mIAbrirMision);
-        m.add(mIConfig);
+        m.add(mIConsolaKahlo);
         m.add(mIMapa);
+        m.add(mIConfig);
         m.add(mISalir);
         setJMenuBar(menuBar);
     }
@@ -122,20 +132,7 @@ public class KFrame extends javax.swing.JFrame{
      * @return jframe
      */
     private JFrame getMapa(){
-        
-        if(mapa != null)
-            return mapa;
-        
-        browser = new Browser();
-        BrowserView browserView = new BrowserView(browser);
-
-        mapa = new KFrame("Mapa");
-        mapa.setDefaultCloseOperation(WindowConstants.HIDE_ON_CLOSE);
-        mapa.add(browserView, BorderLayout.CENTER);
-        mapa.setSize(700, 500);
-        mapa.setLocationRelativeTo(null);
-
-        browser.loadURL("http://www.maps.google.com");
+        mapa = KFrameMap.getMapa();
         return mapa;
     }
 

@@ -6,10 +6,12 @@ import static kahlo.LecturaPuerto.entrada;
 import gnu.io.SerialPortEvent;
 import gnu.io.SerialPortEventListener;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.Timer;
+import java.util.TimerTask;
 import java.util.TooManyListenersException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -31,6 +33,7 @@ public class PanelMonitoreo extends KFrame implements SerialPortEventListener{
     ImageIcon iconoComunicacion = new javax.swing.ImageIcon(getClass().getResource("/Recursos/ImgComunicacion.jpg"));
     ImageIcon iconoApagado = new javax.swing.ImageIcon(getClass().getResource("/Recursos/ImgApagado.jpg"));
     public static boolean inMision = false;
+    ConsolaKahlo ck = null;
     
     //<editor-fold defaultstate="collapsed" desc=" Colecciones  de datos actuales ">
         DefaultCategoryDataset d = new DefaultCategoryDataset();
@@ -53,6 +56,7 @@ public class PanelMonitoreo extends KFrame implements SerialPortEventListener{
         inicioPaneles();
         this.setBackground(java.awt.Color.CYAN);
         lblBanderaComunicacion.setIcon(iconoFalla);    
+        ck = ConsolaKahlo.getConsolaKahlo();
     }
     
     /**
@@ -63,6 +67,9 @@ public class PanelMonitoreo extends KFrame implements SerialPortEventListener{
         try {  
          LecturaPuerto.puertoSerie.addEventListener(this);  
         } catch (TooManyListenersException e) {}
+        
+        Timer t = new Timer();
+        t.schedule(new ListenerSerial(), 0, 300);
     
     }
     
@@ -329,6 +336,16 @@ public class PanelMonitoreo extends KFrame implements SerialPortEventListener{
         txtAreaDescripcion.setColumns(20);
         txtAreaDescripcion.setRows(5);
         txtAreaDescripcion.setEnabled(false);
+        txtAreaDescripcion.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusGained(java.awt.event.FocusEvent evt) {
+                txtAreaDescripcionFocusGained(evt);
+            }
+        });
+        txtAreaDescripcion.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                txtAreaDescripcionMouseClicked(evt);
+            }
+        });
         jScrollPane2.setViewportView(txtAreaDescripcion);
 
         btnFinMision.setText("Fin de Mision");
@@ -441,7 +458,7 @@ public class PanelMonitoreo extends KFrame implements SerialPortEventListener{
         txtServoBI.setEnabled(false);
 
         lblServoBI.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
-        lblServoBI.setText("Brazo Izquierdo");
+        lblServoBI.setText("Servo paracaidas");
 
         txtServoLiberacion.setEnabled(false);
 
@@ -489,7 +506,7 @@ public class PanelMonitoreo extends KFrame implements SerialPortEventListener{
                             .addComponent(txtTInterna, javax.swing.GroupLayout.PREFERRED_SIZE, 199, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(txtHumedad, javax.swing.GroupLayout.PREFERRED_SIZE, 199, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(txtPresion, javax.swing.GroupLayout.PREFERRED_SIZE, 199, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                .addContainerGap(86, Short.MAX_VALUE))
+                .addContainerGap(82, Short.MAX_VALUE))
         );
         jPanelDatosBrutosLayout.setVerticalGroup(
             jPanelDatosBrutosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -617,6 +634,14 @@ public class PanelMonitoreo extends KFrame implements SerialPortEventListener{
         System.exit(0); 
     }//GEN-LAST:event_btnFinMisionActionPerformed
 
+    private void txtAreaDescripcionFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtAreaDescripcionFocusGained
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtAreaDescripcionFocusGained
+
+    private void txtAreaDescripcionMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_txtAreaDescripcionMouseClicked
+        setDatosMision();
+    }//GEN-LAST:event_txtAreaDescripcionMouseClicked
+
 //    /**
 //     * @param args the command line arguments
 //     */
@@ -698,7 +723,7 @@ public class PanelMonitoreo extends KFrame implements SerialPortEventListener{
 
     @Override
     public void serialEvent(SerialPortEvent event) {
-        if (event.getEventType() == SerialPortEvent.DATA_AVAILABLE) {
+        /*if (event.getEventType() == SerialPortEvent.DATA_AVAILABLE) {
 
             byte[] readBuffer = new byte[100];
             try {
@@ -710,7 +735,8 @@ public class PanelMonitoreo extends KFrame implements SerialPortEventListener{
 
                 //Ponemos en los datos en una cadena para parsear los datos
                 String result = new String(readBuffer);
-                if (ManejoDatos.switchDatos(result.toCharArray())) {
+                ck.add_datos(result.trim().replaceAll("\n", "").replaceAll("\t", "") + "\n");
+                if (ManejoDatos.switchDatos(result.trim().replaceAll("\n", "").replaceAll("\t", "").toCharArray())) {
                     ManejoDatos.datosMisionBruto.append(result);
                     actualizarPaneles();
                     lblBanderaComunicacion.setIcon(iconoComunicacion);
@@ -721,7 +747,7 @@ public class PanelMonitoreo extends KFrame implements SerialPortEventListener{
             } catch (IOException e) {
                 JOptionPane.showMessageDialog(null, "ERROR", "ERROR", JOptionPane.ERROR_MESSAGE);
             }
-        }
+        }*/
     }
     
     /**
@@ -743,5 +769,42 @@ public class PanelMonitoreo extends KFrame implements SerialPortEventListener{
      */
     public void setPanelDatosMisionSeleccionado(){
         jTabContenedorPaneles.setSelectedComponent(jPanelDatosMision);
+    }
+    
+    private class ListenerSerial extends TimerTask{
+
+        @Override
+        public void run() {
+            byte[] readBuffer = new byte[100];
+            int size = 0;
+            try {
+                for (int i = 0; i < 100; i++) {
+                    if (entrada.available() > 0) {
+                        size = entrada.read(readBuffer);
+                    }
+                }
+
+                //Ponemos en los datos en una cadena para parsear los datos
+                String result = new String(Arrays.copyOf(readBuffer, size));
+                ck.add_datos(result.trim().replaceAll("\n", "").replaceAll("\t", "") + "\n");
+                if (ManejoDatos.switchDatos(result.trim().replaceAll("\n", "").replaceAll("\t", "").toCharArray())) {
+                    ManejoDatos.datosMisionBruto.append(result);
+                    actualizarPaneles();
+                    lblBanderaComunicacion.setIcon(iconoComunicacion);
+                } else {
+                    lblBanderaComunicacion.setIcon(iconoFalla);
+                }
+
+            } catch (IOException e) {
+                JOptionPane.showMessageDialog(null, "ERROR", "ERROR", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+        
+    }
+    
+    public void setDatosMision(){
+        lblNombreMision.setText(ManejoDatos.knombreMision);
+        lblInicionMisioin.setText(ManejoDatos.kinicioMision);
+        txtAreaDescripcion.setText(ManejoDatos.kdescripcionMision);
     }
 }

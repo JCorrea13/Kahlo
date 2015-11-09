@@ -1,5 +1,7 @@
 package kahlo;
 
+import Maps.KFrameMap;
+import Maps.Punto;
 import componentes.KDialog;
 import config.Config;
 import config.Configuracion;
@@ -50,14 +52,18 @@ public class ManejoDatos {
     public static boolean initManejoDatos(String rutaArchivo, String mision, String descripcion){
         
         ManejadorArchivos ma = new ManejadorArchivos();
-        if(ma.existeAchivo(rutaArchivo + "/" + mision + "/" + mision + ".kab") ||
-                ma.existeAchivo(rutaArchivo + "/" + mision + "/" + mision + ".kar") ||
-                ma.existeAchivo(rutaArchivo + "/" + mision + "/" + mision + ".ka"))
-            return false;
+//        if(ma.existeAchivo(rutaArchivo + "/" + mision + "/" + mision + ".kab") ||
+//                ma.existeAchivo(rutaArchivo + "/" + mision + "/" + mision + ".kar") ||
+//                ma.existeAchivo(rutaArchivo + "/" + mision + "/" + mision + ".ka"))
+//            return false;
         
         try {
+            knombreMision = mision;
+            kdescripcionMision = descripcion;
+            krutaArchivo = rutaArchivo + "/" + knombreMision + "/";
+            
            //creamos el archivo de los datos generales de la mision
-           ma.setContenidoArchivo(ManejoDatos.krutaArchivo + ManejoDatos.knombreMision + ".ka", getConfiguracionGeneralArchivoKA(mision, descripcion));
+           ma.setContenidoArchivo(ManejoDatos.krutaArchivo + "/" + ManejoDatos.knombreMision + ".ka", getConfiguracionGeneralArchivoKA(mision, descripcion));
            //actualizamos la configuracion de "CONF_K_VAR_PRUEBAS" de la aplicacion
            Configuracion c = ManejadorConfiguarciones.getConfiguracion(Config.CONF_K_VAR_PRUEBAS);
            c.setValor((Integer.valueOf(c.getValor())+ 1) + "");
@@ -65,14 +71,12 @@ public class ManejoDatos {
         } catch (IOException ex) {
             new KDialog(null, "ERROR AL GUARDAR LA MISIOIN :/", KDialog.Tipo.ALERTA).setVisible(true);
             Logger.getLogger(PanelMonitoreo.class.getName()).log(Level.SEVERE, null, ex);
+            return false;
         }
                 
-        knombreMision = mision;
-        kdescripcionMision = descripcion;
-        krutaArchivo = rutaArchivo + "/" + knombreMision + "/";
         
         
-        return false;
+        return true;
     }
     
     /**
@@ -91,7 +95,7 @@ public class ManejoDatos {
             if(!(cadena.contains("@") && cadena.contains("#"))){
                     return true;
             }else{
-                parseParametros(cadena.substring(cadena.indexOf("@") + 1,cadena.indexOf("#") + 1));
+                parseParametros(cadena.substring(cadena.indexOf("@") + 1,cadena.substring(cadena.indexOf("@")).indexOf("#") + 1));
                 guardaValoresParseados();
                 cadena = cadena.substring(cadena.indexOf("@") + 1,cadena.indexOf("#") + 1);
             }
@@ -151,6 +155,8 @@ public class ManejoDatos {
         try{
         voltaje = Double.parseDouble((datosSensores.substring(datosSensores.indexOf("╦")+1,datosSensores.indexOf("#")).trim().isEmpty()? "0" :datosSensores.substring(datosSensores.indexOf("╦") +1,datosSensores.indexOf("#")).trim()));
         }catch(NumberFormatException e){}
+    
+        KFrameMap.setPuntoActual(new Punto((float)altitud*.000001f, (float)longitud*.00001f));
     }
 
     public static String aString() {

@@ -1,5 +1,7 @@
 package kahlo;
 
+import Maps.KFrameMap;
+import Maps.ManejadorKPP;
 import componentes.KFrame;
 import config.Config;
 import config.ManejadorConfiguarciones;
@@ -10,6 +12,11 @@ import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import config.Configuracion;
 import java.io.File;
+import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.filechooser.FileFilter;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 /**
  *
@@ -19,7 +26,7 @@ public class ConfiguracionMision extends KFrame {
 
     private static ConfiguracionMision dialogo = null;
 
-    public ConfiguracionMision() {
+    private ConfiguracionMision() {
         super("Configuracion Mision");
         initComponents();
         //este metodo carga los componentes
@@ -157,6 +164,9 @@ public class ConfiguracionMision extends KFrame {
         btnRuta = new javax.swing.JButton();
         checkPrueba = new java.awt.Checkbox();
         jCheckBox1 = new javax.swing.JCheckBox();
+        txtKpp = new javax.swing.JTextField();
+        jLabel4 = new javax.swing.JLabel();
+        btnKpp = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -206,6 +216,18 @@ public class ConfiguracionMision extends KFrame {
 
         jCheckBox1.setText("jCheckBox1");
 
+        txtKpp.setEditable(false);
+
+        jLabel4.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
+        jLabel4.setText("kpp");
+
+        btnKpp.setText("...");
+        btnKpp.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnKppActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -245,7 +267,13 @@ public class ConfiguracionMision extends KFrame {
                                                         .addComponent(cboPuerto, javax.swing.GroupLayout.PREFERRED_SIZE, 340, javax.swing.GroupLayout.PREFERRED_SIZE)
                                                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                                         .addComponent(btnRecargar, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)))))))
-                                .addGap(0, 0, Short.MAX_VALUE)))
+                                .addGap(0, 0, Short.MAX_VALUE))
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                                .addComponent(jLabel4)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(txtKpp, javax.swing.GroupLayout.PREFERRED_SIZE, 321, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(btnKpp)))
                         .addContainerGap())))
         );
         layout.setVerticalGroup(
@@ -262,7 +290,12 @@ public class ConfiguracionMision extends KFrame {
                     .addComponent(btnRuta))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(checkPrueba, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(58, 58, 58)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel4)
+                    .addComponent(txtKpp, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnKpp))
+                .addGap(25, 25, 25)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(cboPuerto, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btnRecargar)
@@ -324,9 +357,29 @@ public class ConfiguracionMision extends KFrame {
         }
     }//GEN-LAST:event_btnRutaActionPerformed
 
+    private JFileChooser chooser;
+    private void btnKppActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnKppActionPerformed
+
+        chooser = new JFileChooser();
+        chooser.setDialogTitle("Ruta");
+        chooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
+        
+        if (chooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
+            txtKpp.setText(chooser.getSelectedFile().toString());
+            try {
+                KFrameMap.setpPreestablecidos(ManejadorKPP.recuperaKPPS(chooser.getSelectedFile().toString()));
+            } catch (IOException ex) {
+                Logger.getLogger(ConfiguracionMision.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        } else {
+            System.out.println("ninguna ruta fue seleccionada");
+        }
+    }//GEN-LAST:event_btnKppActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnAceptar;
+    private javax.swing.JButton btnKpp;
     private javax.swing.JButton btnRecargar;
     private javax.swing.JButton btnRuta;
     private javax.swing.JComboBox cboPuerto;
@@ -336,10 +389,12 @@ public class ConfiguracionMision extends KFrame {
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel4;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JLabel lblPuerto;
     private javax.swing.JLabel lblVelocidad;
     private javax.swing.JTextArea txtAreaDescripcion;
+    private javax.swing.JTextField txtKpp;
     private javax.swing.JTextField txtNombreMision;
     private javax.swing.JTextField txtRuta;
     // End of variables declaration//GEN-END:variables

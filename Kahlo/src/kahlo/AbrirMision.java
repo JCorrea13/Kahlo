@@ -226,10 +226,12 @@ public class AbrirMision extends KFrame {
 
     private void leerArchivoDatosMision(String ruta) throws IOException{
         ArrayList<String> datos = ma.getContenidoArchivoToArray(ruta);
-        ManejoDatos.knombreMision = (String)datos.get(1).substring(1,datos.get(1).length() -1);
-        ManejoDatos.kinicioMision = (String)datos.get(2).substring(1,datos.get(2).length() -1);
-        ManejoDatos.kdescripcionMision = (String)datos.get(3).substring(1,datos.get(3).length() -1);
-        ManejoDatos.kfinMision = (String)datos.get(4).substring(1,datos.get(4).length() -1);
+        try{
+            ManejoDatos.knombreMision = (String)datos.get(0).substring(1,datos.get(1).length() -1);
+            ManejoDatos.kinicioMision = (String)datos.get(1).substring(1,datos.get(2).length() -1);
+            ManejoDatos.kdescripcionMision = (String)datos.get(2).substring(1,datos.get(3).length() -1);
+            ManejoDatos.kfinMision = (String)datos.get(3).substring(1,datos.get(4).length() -1);
+        }catch(Exception ex){}
     }
     
 //    /**

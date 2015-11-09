@@ -42,7 +42,7 @@ public class ManejadorArchivos {
     public ArrayList<String> getContenidoArchivoToArray(String ruta) throws FileNotFoundException, IOException{
         ArrayList<String> al = new ArrayList<>();
         String texto;
-        
+
         
         FileReader lector = new FileReader(ruta);
         BufferedReader br = new BufferedReader(lector);
@@ -61,6 +61,8 @@ public class ManejadorArchivos {
      * @throws IOException 
      */
     public void setContenidoArchivo(String ruta, String contenido) throws IOException{
+        //validamos el directorio de trabajo
+        verificaDiretorioTrabajo(ruta.substring(0, ruta.lastIndexOf("/")));
         
         File f = new File(ruta);
         FileWriter fw = new FileWriter(f, false);
@@ -75,6 +77,9 @@ public class ManejadorArchivos {
      * @throws IOException 
      */
     public void setContenidoArchivoInArray(String ruta, ArrayList<String> contenido) throws IOException{
+        
+        //validamos el directorio de trabajo
+        verificaDiretorioTrabajo(ruta.substring(0, ruta.lastIndexOf("/")));
         
         File f = new File(ruta);
         FileWriter fw = new FileWriter(f, false);
@@ -92,6 +97,9 @@ public class ManejadorArchivos {
      */
     public void agregaContenidoArchivo(String ruta, String contenido) throws IOException{
         
+        //validamos el directorio de trabajo
+        verificaDiretorioTrabajo(ruta.substring(0, ruta.lastIndexOf("/")));
+        
         File f = new File(ruta);
         FileWriter fw = new FileWriter(f, true);
         fw.write("\n" + contenido);
@@ -105,6 +113,9 @@ public class ManejadorArchivos {
      * @throws IOException 
      */
     public void agregaContenidoArchivoInArray(String ruta, ArrayList<String> contenido) throws IOException{
+        
+        //validamos el directorio de trabajo
+        verificaDiretorioTrabajo(ruta.substring(0, ruta.lastIndexOf("/")));
         
         File f = new File(ruta);
         FileWriter fw = new FileWriter(f, true);
@@ -126,6 +137,16 @@ public class ManejadorArchivos {
         File f = new File(ruta);
         return f.exists();
         
+    }
+    
+    /**
+    * Este metodo verifica que el directorio de trabajo exista
+    * y si no existe lo crea
+    */
+    private void verificaDiretorioTrabajo(String directorioTrabajo){
+        File f = new File(directorioTrabajo);
+        if(!f.exists())
+            f.mkdirs();
     }
     
 }
